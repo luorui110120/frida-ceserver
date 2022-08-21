@@ -111,7 +111,15 @@ def recvall(s, size, flags=0):
         pos += read
     return bytes(buffer)
 
+def get_host_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+    finally:
+        s.close()
 
+    return ip
 class BinaryReader:
     def __init__(self, base):
         self.base = base
@@ -960,7 +968,7 @@ def ceserver(pid, api, symbol_api, config, session):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         thread_count = 0
-        s.bind(("127.0.0.1", 52736))
+        s.bind((get_host_ip(), 52736))
         s.listen(32)
         lock = threading.Lock()
         while True:

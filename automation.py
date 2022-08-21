@@ -37,15 +37,20 @@ class ADBAutomation:
 class SSHAutomation:
     def __init__(self, configJson):
         self.ip = configJson["ip"]
+        self.port = configJson["port"]
         self.username = configJson["username"]
         self.password = configJson["password"]
+        self.key_filename = configJson["key_filename"]
 
         self.ceserver_path = configJson["ceserver_path"]
         self.debugserver_path = configJson["debugserver_path"]
 
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.WarningPolicy())
-        self.client.connect(self.ip, username=self.username, password=self.password)
+        if "" == self.password and "" != self.key_filename:
+            self.client.connect(self.ip, port=self.port, username=self.username, key_filename=self.key_filename)
+        else:
+            self.client.connect(self.ip, port=self.port, username=self.username, password=self.password)
 
     def exec_ceserver(self):
         # check ceserver running
